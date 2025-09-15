@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Productos</h2>
+
+<div class="mb-3">
+    <form method="GET" action="{{ url_for('buscar_producto') }}" class="d-flex">
+        <input type="text" name="nombre" class="form-control me-2" placeholder="Buscar por nombre" style="max-width: 300px;">
+        <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+        <a href="{{ url_for('listar_productos') }}" class="btn btn-outline-info ms-2">Ver Todos</a>
+    </form>
+</div>
+
+<form method="POST" action="{{ url_for('agregar_producto') }}" class="mb-3">
+  <div class="row g-2">
+    <div class="col"><input type="text" name="nombre" class="form-control" placeholder="Nombre" required></div>
+    <div class="col"><input type="number" step="0.01" name="precio" class="form-control" placeholder="Precio" required></div>
+    <div class="col"><input type="number" name="stock" class="form-control" placeholder="Stock" required></div>
+    <div class="col"><button class="btn btn-primary">Agregar</button></div>
+  </div>
+</form>
+
+<table class="table table-bordered">
+  <thead><tr><th>ID</th><th>Nombre</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead>
+  <tbody>
+    {% for p in productos %}
+      <tr>
+        <td>{{ p[0] }}</td>
+        <td>{{ p[1] }}</td>
+        <td>{{ p[2] }}</td>
+        <td>{{ p[3] }}</td>
+        <td>
+          <a href="{{ url_for('editar_producto', id=p[0]) }}" class="btn btn-sm btn-warning me-1">Editar</a>
+          <a href="{{ url_for('eliminar_producto', id=p[0]) }}" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar este producto?')">Eliminar</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

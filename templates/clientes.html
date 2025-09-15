@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Lista de Clientes</h2>
+    <a href="{{ url_for('agregar_cliente') }}" class="btn btn-primary">Agregar Cliente</a>
+</div>
+
+<div class="mb-3">
+    <form method="GET" action="{{ url_for('buscar_cliente') }}" class="d-flex">
+        <input type="text" name="nombre" class="form-control me-2" placeholder="Buscar por nombre" style="max-width: 200px;">
+        <input type="text" name="cedula" class="form-control me-2" placeholder="Buscar por cédula" style="max-width: 200px;">
+        <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+        <a href="{{ url_for('listar_clientes') }}" class="btn btn-outline-info ms-2">Ver Todos</a>
+    </form>
+</div>
+
+<table class="table table-bordered">
+    <thead>
+        <tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Cédula</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+        {% for cliente in clientes %}
+        <tr>
+            <td>{{ cliente.id }}</td>
+             <td>{{ cliente.nombre }}</td>
+             <td>{{ cliente.correo }}</td>
+             <td>{{ cliente.cedula }}</td>
+             <td>
+                <a href="{{ url_for('editar_cliente', id=cliente.id) }}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{{ url_for('eliminar_cliente', id=cliente.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar este cliente?')">Eliminar</a>
+             </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

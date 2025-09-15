@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Agregar Cliente</h2>
+
+<form method="POST" class="mb-3">
+  <div class="mb-3">
+    <label for="nombre" class="form-label">Nombre</label>
+    <input type="text" name="nombre" id="nombre" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label for="correo" class="form-label">Correo</label>
+    <input type="email" name="correo" id="correo" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label for="cedula" class="form-label">Cédula</label>
+    <input type="text" name="cedula" id="cedula" class="form-control" required>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Agregar Cliente</button>
+  <a href="{{ url_for('listar_clientes') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

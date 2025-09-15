@@ -1,0 +1,8 @@
+<h2>Agregar Cliente</h2>
+<form method="POST">
+    <label>Nombre:</label><input type="text" name="nombre" required><br>
+    <label>Correo:</label><input type="email" name="correo" required><br>
+    <label>Teléfono:</label><input type="text" name="telefono" required><br>
+    <button type="submit">Agregar</button>
+</form>
+<a href="{{ url_for('clientes') }}">Volver a la lista</a>

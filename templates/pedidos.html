@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Pedidos</h2>
+    <small class="text-muted">Registra y consulta tus pedidos fácilmente</small>
+</div>
+
+<div class="mb-3">
+    <form method="GET" action="{{ url_for('buscar_pedido') }}" class="d-flex">
+        <input type="text" name="cliente" class="form-control me-2" placeholder="Buscar por cliente" style="max-width: 300px;">
+        <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+        <a href="{{ url_for('gestionar_pedidos') }}" class="btn btn-outline-info ms-2">Ver Todos</a>
+    </form>
+</div>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <form method="POST" class="row g-3">
+            <div class="col-md-4">
+                <select name="cliente_id" class="form-select" required>
+                    <option value="">Seleccione cliente</option>
+                    {% for c in clientes %}
+                        <option value="{{ c.id }}">{{ c.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select name="producto_id" class="form-select" required>
+                    <option value="">Seleccione producto</option>
+                    {% for p in productos %}
+                        <option value="{{ p.id }}">{{ p.nombre }} (stock: {{ p.stock }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="number" name="cantidad" class="form-control" placeholder="Cantidad" min="1" required>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-primary">Registrar Pedido</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive shadow-sm">
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Total</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for o in pedidos %}
+            <tr>
+                <td>{{ o.id }}</td>
+                <td>{{ o.cliente }}</td>
+                <td>{{ o.producto }}</td>
+                <td>{{ o.cantidad }}</td>
+                <td>{{ o.total }}</td>
+                <td>{{ o.fecha }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center text-muted">No hay pedidos registrados</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

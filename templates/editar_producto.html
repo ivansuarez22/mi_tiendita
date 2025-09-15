@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Editar producto</h2>
+<form method="POST">
+  <div class="mb-3"><label class="form-label">Nombre</label><input class="form-control" name="nombre" value="{{ producto[1] }}"></div>
+  <div class="mb-3"><label class="form-label">Precio</label><input class="form-control" name="precio" value="{{ producto[2] }}"></div>
+  <div class="mb-3"><label class="form-label">Stock</label><input class="form-control" name="stock" value="{{ producto[3] }}"></div>
+  <button class="btn btn-primary">Guardar</button>
+</form>
+{% endblock %}
