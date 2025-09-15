@@ -134,11 +134,33 @@ def index():
         return "Error: No se pudo conectar a la base de datos."
     try:
         cur = conn.cursor()
+        # Obtener estadísticas generales
         cur.execute('SELECT COUNT(*) FROM productos')
         num_products = cur.fetchone()[0]
+        
+        cur.execute('SELECT COUNT(*) FROM clientes')
+        num_clients = cur.fetchone()[0]
+        
+        cur.execute('SELECT COUNT(*) FROM pedidos')
+        num_orders = cur.fetchone()[0]
+        
+        # Obtener productos con stock bajo (menos de 10)
+        cur.execute('SELECT COUNT(*) FROM productos WHERE stock < 10')
+        low_stock_products = cur.fetchone()[0]
+        
+        # Obtener total de ventas
+        cur.execute('SELECT COALESCE(SUM(total), 0) FROM pedidos')
+        total_sales = cur.fetchone()[0]
+        
         cur.close()
         conn.close()
-        return render_template('index.html', num_products=num_products)
+        
+        return render_template('index.html', 
+                             num_products=num_products,
+                             num_clients=num_clients,
+                             num_orders=num_orders,
+                             low_stock_products=low_stock_products,
+                             total_sales=total_sales)
     except Exception as e:
         conn.close()
         return f"Error en la consulta: {e}"
