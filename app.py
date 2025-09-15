@@ -525,8 +525,101 @@ def buscar_pedido():
         return f"Error en la búsqueda de pedidos: {e}"
 
 # ------------------ VENTAS TOTALES ------------------
+@app.route('/ventas')
+@login_required
+def ventas_totales():
+    conn = get_conn()
+    if not conn:
+        return "Error: No se pudo conectar a la base de datos."
+    try:
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        
+        # Obtener todas las ventas (pedidos) con detalles
+        cur.execute("""
+            SELECT p.id, c.nombre as cliente, prod.nombre as producto, 
+                   p.cantidad, p.precio_unitario, p.total, p.fecha
+            FROM pedidos p
+            LEFT JOIN clientes c ON p.cliente_id=c.id
+            LEFT JOIN productos prod ON p.producto_id=prod.id
+            ORDER BY p.fecha DESC
+        """)
+        ventas_list = cur.fetchall()
+        
+        # Obtener el total de ventas
+        cur.execute('SELECT COALESCE(SUM(total), 0) FROM pedidos')
+        total_ventas = cur.fetchone()[0]
+        
+        # Obtener estadísticas adicionales
+        cur.execute('SELECT COUNT(*) FROM pedidos')
+        num_ventas = cur.fetchone()[0]
+        
+        cur.execute("""
+            SELECT AVG(total) FROM pedidos
+        """)
+        promedio_venta = cur.fetchone()[0] or 0
+        
+        cur.close()
+        conn.close()
+        
+        return render_template('ventas_totales.html', 
+                             ventas=ventas_list,
+                             total_ventas=total_ventas,
+                             num_ventas=num_ventas,
+                             promedio_venta=promedio_venta)
+    except Exception as e:
+        conn.close()
+        return f"Error al obtener ventas: {e}"
 
-   
+@app.route('/nueva_venta', methods=['GET', 'POST'])
+@login_required
+def nueva_venta():
+    conn = get_conn()
+    if not conn:
+        return "Error: No se pudo conectar a la base de datos."
+    
+    if request.method == 'POST':
+        try:
+            cliente_id = int(request.form.get('cliente_id'))
+            producto_id = int(request.form.get('producto_id'))
+            cantidad = int(request.form.get('cantidad'))
+            
+            cur = conn.cursor()
+            # Usar el procedimiento almacenado para registrar la venta
+            cur.execute('CALL registrar_pedido(%s, %s, %s);', (cliente_id, producto_id, cantidad))
+            conn.commit()
+            cur.close()
+            conn.close()
+            
+            flash('Venta registrada exitosamente', 'success')
+            return redirect(url_for('ventas_totales'))
+            
+        except Exception as e:
+            conn.rollback()
+            conn.close()
+            flash(f'Error al registrar venta: {e}', 'error')
+            return redirect(url_for('nueva_venta'))
+    
+    # GET request - mostrar formulario
+    try:
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        
+        # Obtener clientes
+        cur.execute('SELECT id, nombre FROM clientes ORDER BY nombre')
+        clientes_list = cur.fetchall()
+        
+        # Obtener productos con stock disponible
+        cur.execute('SELECT id, nombre, precio, stock FROM productos WHERE stock > 0 ORDER BY nombre')
+        productos_list = cur.fetchall()
+        
+        cur.close()
+        conn.close()
+        
+        return render_template('nueva_venta.html', 
+                             clientes=clientes_list,
+                             productos=productos_list)
+    except Exception as e:
+        conn.close()
+        return f"Error al cargar formulario de venta: {e}"
 
 if __name__ == '__main__':
     app.run(debug=True)
